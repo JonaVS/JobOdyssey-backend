@@ -18,9 +18,9 @@ public class AuthService
         _tokenService = tokenService;
     }
 
-    public async Task<UserDto> Register(RegisterDto signUpData)
+    public async Task<UserDto> Register(RegisterDto registerData)
     {
-        var user = await _userManager.FindByEmailAsync(signUpData.Email!);
+        var user = await _userManager.FindByEmailAsync(registerData.Email!);
 
         if (user is not null)
         {
@@ -29,11 +29,11 @@ public class AuthService
 
         var newUser = new ApplicationUser()
         {
-            Email = signUpData.Email,
-            UserName = signUpData.UserName,
+            Email = registerData.Email,
+            UserName = registerData.UserName,
         };
 
-        var dbResult = await _userManager.CreateAsync(newUser, signUpData.Password!);
+        var dbResult = await _userManager.CreateAsync(newUser, registerData.Password!);
 
         if (!dbResult.Succeeded)
         {
