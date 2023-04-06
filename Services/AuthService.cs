@@ -1,6 +1,7 @@
 using System.Net;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
+using JobOdysseyApi.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace JobOdysseyApi.Services;
@@ -8,10 +9,10 @@ namespace JobOdysseyApi.Services;
 
 public class AuthService
 {
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly JwtService _tokenService;
 
-    public AuthService(UserManager<IdentityUser> userManager, JwtService tokenService)
+    public AuthService(UserManager<ApplicationUser> userManager, JwtService tokenService)
     {
         _userManager = userManager;
         _tokenService = tokenService;
@@ -26,7 +27,7 @@ public class AuthService
            throw ApiException.CreateException("Email already in use", (int)HttpStatusCode.BadRequest, "Register error");
         }
 
-        var newUser = new IdentityUser()
+        var newUser = new ApplicationUser()
         {
             Email = signUpData.Email,
             UserName = signUpData.UserName,

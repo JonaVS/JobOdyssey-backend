@@ -1,7 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
+using JobOdysseyApi.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace JobOdysseyApi.Services;
@@ -9,7 +9,7 @@ namespace JobOdysseyApi.Services;
 public class JwtService
 {
     private readonly string JwtSecret = DotNetEnv.Env.GetString("JWT_SECRET");
-    public string GenerateJwtToken(IdentityUser user) 
+    public string GenerateJwtToken(ApplicationUser user) 
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(JwtSecret);
