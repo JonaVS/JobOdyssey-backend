@@ -39,6 +39,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddSignInManager<SignInManager<IdentityUser>>();
 
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 
