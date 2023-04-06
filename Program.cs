@@ -1,5 +1,6 @@
 using System.Text;
 using JobOdysseyApi.Data;
+using JobOdysseyApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -36,6 +37,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedEmail = false)
     .AddEntityFrameworkStores<AppDbContext>()
     .AddSignInManager<SignInManager<IdentityUser>>();
+
+builder.Services.AddScoped<JwtService>();
 
 var app = builder.Build();
 
