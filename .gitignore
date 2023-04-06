@@ -6,7 +6,7 @@
 .env
 .vscode
 appsettings*.json
-*.db
+*.db*
 
 # User-specific files
 *.rsuser
