@@ -30,7 +30,8 @@ public class AuthService
         var newUser = new ApplicationUser()
         {
             Email = registerData.Email,
-            UserName = registerData.UserName,
+            UserName = registerData.Email,
+            DisplayName = registerData.DisplayName
         };
 
         var dbResult = await _userManager.CreateAsync(newUser, registerData.Password!);
@@ -44,7 +45,7 @@ public class AuthService
 
         return new UserDto() 
         {
-            UserName = newUser.UserName!,
+            DisplayName = newUser.DisplayName!,
             Email = newUser.Email!,
             Token = jwtToken
         };

@@ -5,8 +5,8 @@ namespace JobOdysseyApi.Dtos;
 public class RegisterDto
 {
     [Required]
-    [MinLength(2, ErrorMessage = "Username must contain at least 2 characters")]
-    public string? UserName { get; set; }
+    [MinLength(2, ErrorMessage = "DisplayName must contain at least 2 characters")]
+    public string? DisplayName { get; set; }
     
     [Required]
     [EmailAddress(ErrorMessage = "The Email field is not a valid")]
