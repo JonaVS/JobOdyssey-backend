@@ -18,7 +18,7 @@ public class AuthService
         _tokenService = tokenService;
     }
 
-    public async Task<Result<UserDto>> Register(RegisterRequestDto registerData)
+    public async Task<Result<AuthResponseDto>> Register(RegisterRequestDto registerData)
     {
         try
         {
@@ -26,7 +26,7 @@ public class AuthService
 
             if (user is not null)
             {
-                return Result<UserDto>.Failure("Email already in use", (int)HttpStatusCode.BadRequest);
+                return Result<AuthResponseDto>.Failure("Email already in use", (int)HttpStatusCode.BadRequest);
             }
 
             var newUser = new ApplicationUser()
@@ -40,12 +40,12 @@ public class AuthService
 
             if (!dbResult.Succeeded)
             {
-                return Result<UserDto>.Failure("An error ocurred during the registration process", (int)HttpStatusCode.InternalServerError);
+                return Result<AuthResponseDto>.Failure("An error ocurred during the registration process", (int)HttpStatusCode.InternalServerError);
             }
 
             var jwtToken = _tokenService.GenerateJwtToken(newUser);
 
-            return Result<UserDto>.Success(new UserDto()
+            return Result<AuthResponseDto>.Success(new AuthResponseDto()
             {
                 DisplayName = newUser.DisplayName!,
                 Email = newUser.Email!,
@@ -54,7 +54,7 @@ public class AuthService
         }
         catch (Exception)
         {
-            return Result<UserDto>.Failure("An error ocurred during the registration process", (int)HttpStatusCode.InternalServerError);
+            return Result<AuthResponseDto>.Failure("An error ocurred during the registration process", (int)HttpStatusCode.InternalServerError);
         }
     }
 }

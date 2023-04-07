@@ -16,12 +16,12 @@ public class AuthController : BaseApiController
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<UserDto>> Register(RegisterRequestDto requestDto)
+    public async Task<ActionResult<AuthResponseDto>> Register(RegisterRequestDto requestDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var registerResult = await _authService.Register(requestDto);
 
-        return HandleResult<UserDto>(registerResult);
+        return HandleResult<AuthResponseDto>(registerResult);
     }
 }
