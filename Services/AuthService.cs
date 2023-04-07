@@ -57,4 +57,37 @@ public class AuthService
             return Result<AuthResponseDto>.Failure("An error ocurred during the registration process", (int)HttpStatusCode.InternalServerError);
         }
     }
+
+    public async Task<Result<AuthResponseDto>> Login(LoginRequestDto loginData)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(loginData.Email!);
+
+            if (user is null)
+            {
+                return Result<AuthResponseDto>.Failure("Invalid credentials", (int)HttpStatusCode.BadRequest);
+            }
+
+            var isValidPassword = await _userManager.CheckPasswordAsync(user, loginData.Password!);
+
+            if (!isValidPassword)
+            {
+                return Result<AuthResponseDto>.Failure("Invalid credentials", (int)HttpStatusCode.BadRequest);
+            }
+
+            var jwtToken = _tokenService.GenerateJwtToken(user);
+
+            return Result<AuthResponseDto>.Success(new AuthResponseDto()
+            {
+                DisplayName = user.DisplayName!,
+                Email = user.Email!,
+                Token = jwtToken
+            });
+        }
+        catch (Exception)
+        {
+            return Result<AuthResponseDto>.Failure("An error has occurred. Please try again", (int)HttpStatusCode.BadRequest);
+        }
+    }
 }
