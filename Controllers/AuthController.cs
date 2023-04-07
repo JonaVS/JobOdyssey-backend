@@ -1,4 +1,3 @@
-using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
 using JobOdysseyApi.Services;
 using Microsoft.AspNetCore.Mvc;
