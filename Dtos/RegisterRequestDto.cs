@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JobOdysseyApi.Dtos;
 
-public class RegisterDto
+public class RegisterRequestDto
 {
     [Required]
     [MinLength(2, ErrorMessage = "DisplayName must contain at least 2 characters")]

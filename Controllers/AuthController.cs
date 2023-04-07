@@ -17,7 +17,7 @@ public class AuthController : BaseApiController
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<UserDto>> Register(RegisterDto requestDto)
+    public async Task<ActionResult<UserDto>> Register(RegisterRequestDto requestDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         

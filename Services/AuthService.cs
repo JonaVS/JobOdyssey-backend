@@ -18,7 +18,7 @@ public class AuthService
         _tokenService = tokenService;
     }
 
-    public async Task<Result<UserDto>> Register(RegisterDto registerData)
+    public async Task<Result<UserDto>> Register(RegisterRequestDto registerData)
     {
         try
         {
