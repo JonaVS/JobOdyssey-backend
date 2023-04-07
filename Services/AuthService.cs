@@ -40,7 +40,7 @@ public class AuthService
 
             if (!dbResult.Succeeded)
             {
-                return Result<AuthResponseDto>.Failure("An error ocurred during the registration process", (int)HttpStatusCode.InternalServerError);
+                return Result<AuthResponseDto>.Failure("An error has occurred. Please try again", (int)HttpStatusCode.InternalServerError);
             }
 
             var jwtToken = _tokenService.GenerateJwtToken(newUser);
@@ -54,7 +54,7 @@ public class AuthService
         }
         catch (Exception)
         {
-            return Result<AuthResponseDto>.Failure("An error ocurred during the registration process", (int)HttpStatusCode.InternalServerError);
+            return Result<AuthResponseDto>.Failure("An error has occurred. Please try again", (int)HttpStatusCode.InternalServerError);
         }
     }
 
