@@ -7,7 +7,7 @@ namespace JobOdysseyApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController : BaseApiController
 {
     private readonly AuthService _authService;
 
@@ -23,8 +23,6 @@ public class AuthController : ControllerBase
         
         var registerResult = await _authService.Register(requestDto);
 
-        if (!registerResult.Succeeded) return StatusCode(registerResult.ErrorCode, registerResult);
-        
-        return Ok(registerResult.Data);
+        return HandleResult<UserDto>(registerResult);
     }
 }
