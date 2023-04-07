@@ -24,4 +24,14 @@ public class AuthController : BaseApiController
 
         return HandleResult<AuthResponseDto>(registerResult);
     }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<AuthResponseDto>> Login(LoginRequestDto requestDto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var loginResult = await _authService.Login(requestDto);
+
+        return HandleResult<AuthResponseDto>(loginResult);
+    }
 }
