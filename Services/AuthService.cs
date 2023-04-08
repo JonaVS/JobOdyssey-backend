@@ -1,4 +1,5 @@
 using System.Net;
+using AutoMapper;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
 using JobOdysseyApi.Models;
@@ -11,11 +12,13 @@ public class AuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly JwtService _tokenService;
+    private readonly IMapper _mapper;
 
-    public AuthService(UserManager<ApplicationUser> userManager, JwtService tokenService)
+    public AuthService(UserManager<ApplicationUser> userManager, JwtService tokenService, IMapper mapper)
     {
         _userManager = userManager;
         _tokenService = tokenService;
+        _mapper = mapper;
     }
 
     public async Task<Result<AuthResponseDto>> Register(RegisterRequestDto registerData)
@@ -45,12 +48,7 @@ public class AuthService
 
             var jwtToken = _tokenService.GenerateJwtToken(newUser);
 
-            return Result<AuthResponseDto>.Success(new AuthResponseDto()
-            {
-                DisplayName = newUser.DisplayName!,
-                Email = newUser.Email!,
-                Token = jwtToken
-            });
+            return Result<AuthResponseDto>.Success(GetAuthResponseDto(newUser, jwtToken));
         }
         catch (Exception)
         {
@@ -78,16 +76,16 @@ public class AuthService
 
             var jwtToken = _tokenService.GenerateJwtToken(user);
 
-            return Result<AuthResponseDto>.Success(new AuthResponseDto()
-            {
-                DisplayName = user.DisplayName!,
-                Email = user.Email!,
-                Token = jwtToken
-            });
+            return Result<AuthResponseDto>.Success(GetAuthResponseDto(user, jwtToken));
         }
         catch (Exception)
         {
             return Result<AuthResponseDto>.Failure("An error has occurred. Please try again", (int)HttpStatusCode.BadRequest);
         }
+    }
+
+    private AuthResponseDto GetAuthResponseDto(ApplicationUser user, string jwtToken)
+    {
+        return _mapper.Map<AuthResponseDto>(user, opt => opt.Items["jwtToken"] = jwtToken);
     }
 }
