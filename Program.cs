@@ -1,4 +1,5 @@
 using System.Text;
+using JobOdysseyApi.Configurations;
 using JobOdysseyApi.Data;
 using JobOdysseyApi.Models;
 using JobOdysseyApi.Services;
@@ -15,6 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSqlite<AppDbContext>(DotNetEnv.Env.GetString("DB_CONNECTION"));
+builder.Services.AddAutoMapper(typeof(MapperConfig));
 
 builder.Services.AddAuthentication(options =>
 {
