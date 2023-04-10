@@ -46,9 +46,14 @@ public class AuthService
                 return Result<AuthResponseDto>.Failure("An error has occurred. Please try again", (int)HttpStatusCode.InternalServerError);
             }
 
-            var jwtToken = _tokenService.GenerateJwtToken(newUser);
+            var authTokensResult = await _tokenService.GenerateAuthTokens(newUser);
 
-            return Result<AuthResponseDto>.Success(GetAuthResponseDto(newUser, jwtToken));
+            if (!authTokensResult.Succeeded)
+            {
+                return Result<AuthResponseDto>.Failure(authTokensResult.Error!, authTokensResult.ErrorCode);
+            }
+
+            return Result<AuthResponseDto>.Success(GetAuthResponseDto(newUser, authTokensResult.Data!));
         }
         catch (Exception)
         {
@@ -74,9 +79,14 @@ public class AuthService
                 return Result<AuthResponseDto>.Failure("Invalid credentials", (int)HttpStatusCode.BadRequest);
             }
 
-            var jwtToken = _tokenService.GenerateJwtToken(user);
+            var authTokensResult = await _tokenService.GenerateAuthTokens(user);
 
-            return Result<AuthResponseDto>.Success(GetAuthResponseDto(user, jwtToken));
+            if (!authTokensResult.Succeeded)
+            {
+                return Result<AuthResponseDto>.Failure(authTokensResult.Error!, authTokensResult.ErrorCode);
+            }
+
+            return Result<AuthResponseDto>.Success(GetAuthResponseDto(user, authTokensResult.Data!));
         }
         catch (Exception)
         {
@@ -84,8 +94,12 @@ public class AuthService
         }
     }
 
-    private AuthResponseDto GetAuthResponseDto(ApplicationUser user, string jwtToken)
+    private AuthResponseDto GetAuthResponseDto(ApplicationUser user, AuthTokensDto authTokens)
     {
-        return _mapper.Map<AuthResponseDto>(user, opt => opt.Items["jwtToken"] = jwtToken);
+        return _mapper.Map<AuthResponseDto>(user, opt =>
+        {
+            opt.Items["jwtToken"] = authTokens.Token;
+            opt.Items["refreshToken"] = authTokens.RefreshToken;
+        });
     }
 }

@@ -11,7 +11,8 @@ public class MapperConfig : Profile
         CreateMap<ApplicationUser, AuthResponseDto>().ConstructUsing((user, context) => new AuthResponseDto{
             DisplayName = user.DisplayName!,
             Email = user.Email!,
-            Token = context.Items["jwtToken"] as string ?? string.Empty
+            Token = context.Items["jwtToken"] as string ?? string.Empty,
+            RefreshToken = context.Items["refreshToken"] as string ?? string.Empty
         });
     }
 }
