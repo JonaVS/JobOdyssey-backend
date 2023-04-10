@@ -38,7 +38,7 @@ public class AuthTokensService
         }
     }
 
-    public string GenerateJwtToken(ApplicationUser user) 
+    private string GenerateJwtToken(ApplicationUser user) 
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(JwtSecret);
