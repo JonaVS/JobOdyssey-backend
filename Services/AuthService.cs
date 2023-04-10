@@ -11,10 +11,10 @@ namespace JobOdysseyApi.Services;
 public class AuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly JwtService _tokenService;
+    private readonly AuthTokensService _tokenService;
     private readonly IMapper _mapper;
 
-    public AuthService(UserManager<ApplicationUser> userManager, JwtService tokenService, IMapper mapper)
+    public AuthService(UserManager<ApplicationUser> userManager, AuthTokensService tokenService, IMapper mapper)
     {
         _userManager = userManager;
         _tokenService = tokenService;

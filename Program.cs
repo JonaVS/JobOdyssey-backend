@@ -17,7 +17,7 @@ builder.Services.AddJwtAuthentication();
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedEmail = false)
     .AddEntityFrameworkStores<AppDbContext>()
     .AddSignInManager<SignInManager<ApplicationUser>>();
-builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<AuthTokensService>();
 builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();

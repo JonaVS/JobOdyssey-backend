@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace JobOdysseyApi.Services;
 
-public class JwtService
+public class AuthTokensService
 {
     private readonly string JwtSecret = DotNetEnv.Env.GetString("JWT_SECRET");
     public string GenerateJwtToken(ApplicationUser user) 
