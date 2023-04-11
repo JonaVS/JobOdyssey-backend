@@ -34,4 +34,21 @@ public class AuthController : BaseApiController
 
         return HandleResult<AuthResponseDto>(loginResult);
     }
+    
+    private RefreshTokenRequestDto? GetTokens()
+    {
+        string? token;
+        string? refreshToken;
+
+        token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        refreshToken = Request.Cookies["refreshToken"];
+
+        if (token is null || refreshToken is null) return null;
+        
+        return new RefreshTokenRequestDto() 
+        {
+            Token = token,
+            RefreshToken = refreshToken
+        };
+    }
 }
