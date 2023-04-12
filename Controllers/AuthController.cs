@@ -1,3 +1,4 @@
+using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
 using JobOdysseyApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -34,14 +35,14 @@ public class AuthController : BaseApiController
 
         return HandleResult<AuthResponseDto>(loginResult);
     }
-    
+
     private RefreshTokenRequestDto? GetTokens()
     {
         string? token;
         string? refreshToken;
 
         token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-        refreshToken = Request.Cookies["refreshToken"];
+        refreshToken = Request.Cookies["refresh_token"];
 
         if (token is null || refreshToken is null) return null;
         
@@ -50,5 +51,28 @@ public class AuthController : BaseApiController
             Token = token,
             RefreshToken = refreshToken
         };
+    }
+
+    protected override ActionResult<T> HandleResult<T>(Result<T> result)
+    {
+        if (typeof(T) == typeof(AuthResponseDto))
+        {
+            if (result.Succeeded && result.Data is AuthResponseDto authResult)
+            {
+                SetRefreshTokenCookie(authResult.RefreshToken);
+            }
+        }
+
+        return base.HandleResult(result);
+    }
+
+    private void SetRefreshTokenCookie(string refreshToken)
+    {
+        Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = DotNetEnv.Env.GetString("ASPNETCORE_ENVIRONMENT") == "Production" ? true : false,
+            Expires = DateTime.UtcNow.AddMonths(1),
+        });
     }
 }
