@@ -4,6 +4,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Data;
 using JobOdysseyApi.Dtos;
@@ -16,9 +18,12 @@ public class AuthTokensService
     private readonly string JwtSecret = DotNetEnv.Env.GetString("JWT_SECRET");
     private SecurityToken? generatedToken;
     private readonly AppDbContext _dbContext;
-    public AuthTokensService(AppDbContext dbContext)
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public AuthTokensService(AppDbContext dbContext, UserManager<ApplicationUser> userManager)
     {
         _dbContext = dbContext;
+        _userManager = userManager;
     }
 
     public async Task<Result<AuthTokensDto>> GenerateAuthTokens(ApplicationUser user) {
@@ -27,7 +32,8 @@ public class AuthTokensService
             var authTokens = new AuthTokensDto()
             {
                 Token = GenerateJwtToken(user),
-                RefreshToken = await GenerateRefreshToken(user.Id)
+                RefreshToken = await GenerateRefreshToken(user.Id),
+                User = user
             };
 
             return Result<AuthTokensDto>.Success(authTokens);
@@ -77,10 +83,84 @@ public class AuthTokensService
             IsUsed = false
         };
 
-        await _dbContext.RefreshTokens!.AddAsync(refreshToken);
+        await _dbContext.RefreshTokens.AddAsync(refreshToken);
         await _dbContext.SaveChangesAsync();
 
         return refreshToken.Token;
+    }
+
+    public async Task<Result<AuthTokensDto>> VerifyAndRefreshTokens(string token, string refreshToken)
+    {
+        try
+        {
+            //****JWT TOKEN VALIDATIONS START****
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+
+            if (!jwtTokenHandler.CanReadToken(token))
+            {
+                return Result<AuthTokensDto>.Failure("Invalid JWT token format", (int)HttpStatusCode.BadRequest);
+            } 
+                
+            var tokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(JwtSecret)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                /*
+                    This needs to be false here. 
+                    If set to true and the incoming JWT is expired,
+                    then an exception will be trown inside the ValidateToken method and the user will never get a refreshed token
+                */ 
+                ValidateLifetime = false,
+            };
+
+            var tokenInVerification = jwtTokenHandler.ValidateToken(token, tokenValidationParameters, out var validatedToken );
+
+            if (validatedToken is JwtSecurityToken jwtSecurityToken)
+            {
+               var isValidAlgHeader = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase); 
+
+               if (!isValidAlgHeader) return Result<AuthTokensDto>.Failure("Invalid JWT token", (int)HttpStatusCode.BadRequest);
+            }
+            //****JWT TOKEN VALIDATIONS END****
+            
+
+            //****REFRESH TOKEN VALIDATIONS START****
+            var storedRefreshToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshToken);
+
+            if (storedRefreshToken is null 
+                || storedRefreshToken.ExpiresAt < DateTime.UtcNow
+                || storedRefreshToken.JwtId != validatedToken.Id 
+                || storedRefreshToken.IsUsed 
+                || storedRefreshToken.IsRevoked)
+            {
+                return Result<AuthTokensDto>.Failure("Invalid refresh token", (int)HttpStatusCode.BadRequest);
+            }
+
+            var user = await _userManager.FindByIdAsync(storedRefreshToken.UserId);
+
+            if (user is null)
+            {
+                return Result<AuthTokensDto>.Failure("Invalid tokens", (int)HttpStatusCode.BadRequest);
+            }
+            //****REFRESH TOKEN VALIDATIONS END****
+
+            storedRefreshToken.IsUsed = true;
+            await _dbContext.SaveChangesAsync();
+
+            return await GenerateAuthTokens(user);
+
+        }
+        catch (SecurityTokenException)
+        {
+          //Several errors could happen inside JwtSecurityTokenHandler.ValidateToken method.
+          return Result<AuthTokensDto>.Failure("Invalid JWT token", (int)HttpStatusCode.BadRequest); 
+        }
+        catch (Exception)
+        {
+          return Result<AuthTokensDto>.Failure("An error occurred while refreshing the access token", (int)HttpStatusCode.InternalServerError); 
+        }
     }
 
     private string GenerateRefreshTokenString()
