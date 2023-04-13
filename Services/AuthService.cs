@@ -94,6 +94,18 @@ public class AuthService
         }
     }
 
+    public async Task<Result<AuthResponseDto>> RefreshToken(RefreshTokenRequestDto refreshData)
+    {
+        var refreshResult = await _tokenService.VerifyAndRefreshTokens(refreshData.Token, refreshData.RefreshToken);
+
+        if (!refreshResult.Succeeded)
+        {
+           return Result<AuthResponseDto>.Failure(refreshResult.Error!, refreshResult.ErrorCode); 
+        }
+
+        return Result<AuthResponseDto>.Success(GetAuthResponseDto(refreshResult.Data!));
+    }
+
     private AuthResponseDto GetAuthResponseDto(AuthTokensDto authTokens)
     {
         return _mapper.Map<AuthResponseDto>(authTokens.User, opt =>
