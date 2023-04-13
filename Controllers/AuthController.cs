@@ -36,6 +36,18 @@ public class AuthController : BaseApiController
         return HandleResult<AuthResponseDto>(loginResult);
     }
 
+    [HttpPost("refresh-token")]
+    public async Task<ActionResult<AuthResponseDto>> RefreshToken()
+    {
+        var tokens = GetTokens();
+
+        if (tokens is null) return BadRequest("Jwt token and refresh token are expected"); 
+        
+        var refreshResult = await _authService.RefreshToken(tokens);
+
+        return HandleResult<AuthResponseDto>(refreshResult);
+    }
+
     private RefreshTokenRequestDto? GetTokens()
     {
         string? token;
