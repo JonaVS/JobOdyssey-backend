@@ -6,13 +6,13 @@ public class RegisterRequestDto
 {
     [Required]
     [MinLength(2, ErrorMessage = "DisplayName must contain at least 2 characters")]
-    public string? DisplayName { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
     
     [Required]
     [EmailAddress(ErrorMessage = "The Email field is not a valid")]
-    public string? Email { get; set; }
+    public string Email { get; set; } = string.Empty;
 
     [Required]
     [PasswordValidation]
-    public string? Password { get; set; }
+    public string Password { get; set; } = string.Empty;
 }
