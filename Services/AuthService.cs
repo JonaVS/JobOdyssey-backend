@@ -53,7 +53,7 @@ public class AuthService
                 return Result<AuthResponseDto>.Failure(authTokensResult.Error!, authTokensResult.ErrorCode);
             }
 
-            return Result<AuthResponseDto>.Success(GetAuthResponseDto(newUser, authTokensResult.Data!));
+            return Result<AuthResponseDto>.Success(GetAuthResponseDto(authTokensResult.Data!));
         }
         catch (Exception)
         {
@@ -86,7 +86,7 @@ public class AuthService
                 return Result<AuthResponseDto>.Failure(authTokensResult.Error!, authTokensResult.ErrorCode);
             }
 
-            return Result<AuthResponseDto>.Success(GetAuthResponseDto(user, authTokensResult.Data!));
+            return Result<AuthResponseDto>.Success(GetAuthResponseDto(authTokensResult.Data!));
         }
         catch (Exception)
         {
@@ -94,9 +94,9 @@ public class AuthService
         }
     }
 
-    private AuthResponseDto GetAuthResponseDto(ApplicationUser user, AuthTokensDto authTokens)
+    private AuthResponseDto GetAuthResponseDto(AuthTokensDto authTokens)
     {
-        return _mapper.Map<AuthResponseDto>(user, opt =>
+        return _mapper.Map<AuthResponseDto>(authTokens.User, opt =>
         {
             opt.Items["jwtToken"] = authTokens.Token;
             opt.Items["refreshToken"] = authTokens.RefreshToken;
