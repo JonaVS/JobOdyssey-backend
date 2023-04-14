@@ -1,7 +1,9 @@
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
+using JobOdysseyApi.Filters;
 using JobOdysseyApi.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace JobOdysseyApi.Controllers;
 
@@ -17,52 +19,30 @@ public class AuthController : BaseApiController
     }
 
     [HttpPost("register")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<ActionResult<AuthResponseDto>> Register(RegisterRequestDto requestDto)
-    {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-        
+    {        
         var registerResult = await _authService.Register(requestDto);
 
         return HandleResult<AuthResponseDto>(registerResult);
     }
 
     [HttpPost("login")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<ActionResult<AuthResponseDto>> Login(LoginRequestDto requestDto)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-
         var loginResult = await _authService.Login(requestDto);
 
         return HandleResult<AuthResponseDto>(loginResult);
     }
 
     [HttpPost("refresh-token")]
+    [ServiceFilter(typeof(RefreshTokenValidationFilterAttribute))]
     public async Task<ActionResult<AuthResponseDto>> RefreshToken()
     {
-        var tokens = GetTokens();
-
-        if (tokens is null) return BadRequest("Jwt token and refresh token are expected"); 
-        
-        var refreshResult = await _authService.RefreshToken(tokens);
+        var refreshResult = await _authService.RefreshToken((RefreshTokenRequestDto)HttpContext.Items["tokens"]!);
 
         return HandleResult<AuthResponseDto>(refreshResult);
-    }
-
-    private RefreshTokenRequestDto? GetTokens()
-    {
-        string? token;
-        string? refreshToken;
-
-        token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-        refreshToken = Request.Cookies["refresh_token"];
-
-        if (token is null || refreshToken is null) return null;
-        
-        return new RefreshTokenRequestDto() 
-        {
-            Token = token,
-            RefreshToken = refreshToken
-        };
     }
 
     protected override ActionResult<T> HandleResult<T>(Result<T> result)
