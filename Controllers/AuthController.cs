@@ -22,27 +22,21 @@ public class AuthController : BaseApiController
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<ActionResult<AuthResponseDto>> Register(RegisterRequestDto requestDto)
     {        
-        var registerResult = await _authService.Register(requestDto);
-
-        return HandleResult<AuthResponseDto>(registerResult);
+        return HandleResult<AuthResponseDto>(await _authService.Register(requestDto));
     }
 
     [HttpPost("login")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<ActionResult<AuthResponseDto>> Login(LoginRequestDto requestDto)
     {
-        var loginResult = await _authService.Login(requestDto);
-
-        return HandleResult<AuthResponseDto>(loginResult);
+        return HandleResult<AuthResponseDto>(await _authService.Login(requestDto));
     }
 
     [HttpPost("refresh-token")]
     [ServiceFilter(typeof(RefreshTokenValidationFilterAttribute))]
     public async Task<ActionResult<AuthResponseDto>> RefreshToken()
     {
-        var refreshResult = await _authService.RefreshToken((RefreshTokenRequestDto)HttpContext.Items["tokens"]!);
-
-        return HandleResult<AuthResponseDto>(refreshResult);
+        return HandleResult<AuthResponseDto>(await _authService.RefreshToken((RefreshTokenRequestDto)HttpContext.Items["tokens"]!));
     }
 
     protected override ActionResult<T> HandleResult<T>(Result<T> result)
