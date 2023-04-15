@@ -32,7 +32,7 @@ public class AuthController : BaseApiController
         return HandleResult<AuthResponseDto>(await _authService.Login(requestDto));
     }
 
-    [HttpGet("refresh-token")]
+    [HttpPost("refresh-token")]
     [ServiceFilter(typeof(RefreshTokenValidationFilterAttribute))]
     public async Task<ActionResult<AuthResponseDto>> RefreshToken()
     {
