@@ -25,7 +25,7 @@ public class AuthService
     {
         try
         {
-            var user = await _userManager.FindByEmailAsync(registerData.Email!);
+            var user = await _userManager.FindByEmailAsync(registerData.Email);
 
             if (user is not null)
             {
@@ -39,7 +39,7 @@ public class AuthService
                 DisplayName = registerData.DisplayName
             };
 
-            var dbResult = await _userManager.CreateAsync(newUser, registerData.Password!);
+            var dbResult = await _userManager.CreateAsync(newUser, registerData.Password);
 
             if (!dbResult.Succeeded)
             {
@@ -50,7 +50,7 @@ public class AuthService
 
             if (!authTokensResult.Succeeded)
             {
-                return Result<AuthResponseDto>.Failure(authTokensResult.Error!, authTokensResult.ErrorCode);
+                return Result<AuthResponseDto>.Failure(authTokensResult.Error, authTokensResult.ErrorCode);
             }
 
             return Result<AuthResponseDto>.Success(GetAuthResponseDto(authTokensResult.Data!));
@@ -65,14 +65,14 @@ public class AuthService
     {
         try
         {
-            var user = await _userManager.FindByEmailAsync(loginData.Email!);
+            var user = await _userManager.FindByEmailAsync(loginData.Email);
 
             if (user is null)
             {
                 return Result<AuthResponseDto>.Failure("Invalid credentials", (int)HttpStatusCode.BadRequest);
             }
 
-            var isValidPassword = await _userManager.CheckPasswordAsync(user, loginData.Password!);
+            var isValidPassword = await _userManager.CheckPasswordAsync(user, loginData.Password);
 
             if (!isValidPassword)
             {
@@ -83,7 +83,7 @@ public class AuthService
 
             if (!authTokensResult.Succeeded)
             {
-                return Result<AuthResponseDto>.Failure(authTokensResult.Error!, authTokensResult.ErrorCode);
+                return Result<AuthResponseDto>.Failure(authTokensResult.Error, authTokensResult.ErrorCode);
             }
 
             return Result<AuthResponseDto>.Success(GetAuthResponseDto(authTokensResult.Data!));
@@ -100,7 +100,7 @@ public class AuthService
 
         if (!refreshResult.Succeeded)
         {
-           return Result<AuthResponseDto>.Failure(refreshResult.Error!, refreshResult.ErrorCode); 
+           return Result<AuthResponseDto>.Failure(refreshResult.Error, refreshResult.ErrorCode); 
         }
 
         return Result<AuthResponseDto>.Success(GetAuthResponseDto(refreshResult.Data!));
