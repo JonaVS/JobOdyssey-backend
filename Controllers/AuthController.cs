@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
 using JobOdysseyApi.Filters;
@@ -37,6 +38,13 @@ public class AuthController : BaseApiController
     public async Task<ActionResult<AuthResponseDto>> RefreshToken()
     {
         return HandleResult<AuthResponseDto>(await _authService.RefreshToken((RefreshTokenRequestDto)HttpContext.Items["tokens"]!));
+    }
+
+    [Authorize]
+    [HttpGet("is-authenticated")]
+    public async Task<ActionResult<bool>> IsAuthenticated()
+    {
+        return HandleResult<bool>(await _authService.IsAuthenticated(User));
     }
 
     protected override ActionResult<T> HandleResult<T>(Result<T> result)
