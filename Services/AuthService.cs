@@ -91,7 +91,7 @@ public class AuthService
         }
         catch (Exception)
         {
-            return Result<AuthResponseDto>.Failure("An error has occurred. Please try again", (int)HttpStatusCode.BadRequest);
+            return Result<AuthResponseDto>.Failure("An error has occurred. Please try again", (int)HttpStatusCode.InternalServerError);
         }
     }
 
