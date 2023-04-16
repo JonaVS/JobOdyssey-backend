@@ -16,7 +16,7 @@ namespace JobOdysseyApi.Services;
 public class AuthTokensService
 {
     private readonly string JwtSecret = DotNetEnv.Env.GetString("JWT_SECRET");
-    private SecurityToken? generatedToken;
+    private SecurityToken? generatedJwtToken;
     private readonly AppDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
 
@@ -64,9 +64,9 @@ public class AuthTokensService
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
         };
 
-        generatedToken = jwtTokenHandler.CreateToken(tokenDescriptor);
+        generatedJwtToken = jwtTokenHandler.CreateToken(tokenDescriptor);
 
-        return jwtTokenHandler.WriteToken(generatedToken);
+        return jwtTokenHandler.WriteToken(generatedJwtToken);
     }
 
     private async Task<string> GenerateRefreshToken(string userId)
@@ -74,7 +74,7 @@ public class AuthTokensService
 
         var refreshToken = new RefreshToken()
         {
-            JwtId = generatedToken!.Id,
+            JwtId = generatedJwtToken!.Id,
             UserId = userId,
             Token = GenerateRefreshTokenString(),
             IssuedAt = DateTime.UtcNow,
