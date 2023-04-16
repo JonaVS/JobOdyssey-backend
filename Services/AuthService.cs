@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using AutoMapper;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
@@ -91,6 +92,27 @@ public class AuthService
         catch (Exception)
         {
             return Result<AuthResponseDto>.Failure("An error has occurred. Please try again", (int)HttpStatusCode.BadRequest);
+        }
+    }
+
+    public async Task<Result<bool>> IsAuthenticated(ClaimsPrincipal user)
+    {
+        var userId = user.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+        if (string.IsNullOrEmpty(userId)) return Result<bool>.Failure("Invalid user ID", (int)HttpStatusCode.BadRequest);
+
+        try
+        {
+            var dbUser = await _userManager.FindByIdAsync(userId);
+
+            if (dbUser is null) return Result<bool>.Failure("User not found in database.", (int)HttpStatusCode.BadRequest);
+
+            return Result<bool>.Success(true);
+
+        }
+        catch (Exception)
+        {
+            return Result<bool>.Failure("An error occurred while checking user authentication status", (int)HttpStatusCode.InternalServerError);
         }
     }
 
