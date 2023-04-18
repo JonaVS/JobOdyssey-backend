@@ -20,4 +20,37 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         builder.HasPostgresEnum<JobApplicationStatus>();
         base.OnModelCreating(builder);
     }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+	{
+		var insertedEntries = this.ChangeTracker.Entries()
+							   .Where(x => x.State == EntityState.Added)
+							   .Select(x => x.Entity);
+
+		foreach(var insertedEntry in insertedEntries)
+		{
+			var timeTrackableEntity = insertedEntry as TimeTrackableEntity;
+			//If the inserted object is an TimeTrackableEntity.
+			if(timeTrackableEntity != null)
+			{
+				timeTrackableEntity.CreatedAt = DateTimeOffset.UtcNow;
+			}
+		}
+
+		var modifiedEntries = this.ChangeTracker.Entries()
+				   .Where(x => x.State == EntityState.Modified)
+				   .Select(x => x.Entity);
+
+		foreach (var modifiedEntry in modifiedEntries)
+		{
+			//If the modified object is an TimeTrackableEntity.
+			var auditableEntity = modifiedEntry as TimeTrackableEntity;
+			if (auditableEntity != null)
+			{
+				auditableEntity.UpdatedAt = DateTimeOffset.UtcNow;
+			}
+		}
+
+		return base.SaveChangesAsync(cancellationToken);
+	}
 }
