@@ -14,7 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddSwaggerGen();
-builder.Services.AddNpgsql<AppDbContext>(DotNetEnv.Env.GetString("DB_CONNECTION"));
+await builder.Services.AddPostgresDatabase();
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddJwtAuthentication();
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedEmail = false)
