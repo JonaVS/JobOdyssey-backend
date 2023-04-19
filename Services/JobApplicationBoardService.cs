@@ -1,6 +1,8 @@
 using System.Net;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Data;
 using JobOdysseyApi.Dtos;
@@ -46,6 +48,27 @@ public class JobApplicationBoardService : UserAwareBaseService
         catch (Exception)
         {
             return Result<JobBoardResponseDto>.Failure("An error ocurred while creating the Job application board", (int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    public async Task<Result<List<JobBoardResponseDto>>> GetBoards()
+    {
+        try
+        {
+            var userResult = await CheckUserExistence();
+
+            if (!userResult.Succeeded) return Result<List<JobBoardResponseDto>>.Failure(userResult.Error, userResult.ErrorCode);
+
+            var boards = await _dbContext.JobApplicationBoards
+                .Where(board => board.User.Id == userId)
+                .ProjectTo<JobBoardResponseDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return Result<List<JobBoardResponseDto>>.Success(boards);
+        }
+        catch (Exception)
+        {
+            return Result<List<JobBoardResponseDto>>.Failure("An error ocurred while fetching the boards", (int)HttpStatusCode.InternalServerError);
         }
     }
 }
