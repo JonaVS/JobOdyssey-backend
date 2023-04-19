@@ -104,9 +104,9 @@ public class AuthService : UserAwareBaseService
 
         try
         {
-            var dbUser = await _userManager.FindByIdAsync(userId);
-
-            if (dbUser is null) return Result<bool>.Failure("User not found in database.", (int)HttpStatusCode.BadRequest);
+            var userResult = await CheckUserExistence();
+            
+            if (!userResult.Succeeded) return Result<bool>.Failure(userResult.Error, userResult.ErrorCode); 
 
             return Result<bool>.Success(true);
 
