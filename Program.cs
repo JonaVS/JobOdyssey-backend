@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
 // Add services to the container.
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
@@ -22,6 +23,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddSignInManager<SignInManager<ApplicationUser>>();
 builder.Services.AddScoped<AuthTokensService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<JobApplicationBoardService>();
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<RefreshTokenValidationFilterAttribute>();
 
