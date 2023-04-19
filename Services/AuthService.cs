@@ -1,5 +1,4 @@
 using System.Net;
-using System.Security.Claims;
 using AutoMapper;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
@@ -9,13 +8,17 @@ using Microsoft.AspNetCore.Identity;
 namespace JobOdysseyApi.Services;
 
 
-public class AuthService
+public class AuthService : UserAwareBaseService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly AuthTokensService _tokenService;
     private readonly IMapper _mapper;
 
-    public AuthService(UserManager<ApplicationUser> userManager, AuthTokensService tokenService, IMapper mapper)
+    public AuthService(
+        IHttpContextAccessor httpContextAccessor, 
+        UserManager<ApplicationUser> userManager, 
+        AuthTokensService tokenService, 
+        IMapper mapper) : base (httpContextAccessor)
     {
         _userManager = userManager;
         _tokenService = tokenService;
@@ -95,10 +98,8 @@ public class AuthService
         }
     }
 
-    public async Task<Result<bool>> IsAuthenticated(ClaimsPrincipal user)
+    public async Task<Result<bool>> IsAuthenticated()
     {
-        var userId = user.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-
         if (string.IsNullOrEmpty(userId)) return Result<bool>.Failure("Invalid user ID", (int)HttpStatusCode.BadRequest);
 
         try

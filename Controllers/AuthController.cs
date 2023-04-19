@@ -44,7 +44,7 @@ public class AuthController : BaseApiController
     [HttpGet("is-authenticated")]
     public async Task<ActionResult<bool>> IsAuthenticated()
     {
-        return HandleResult<bool>(await _authService.IsAuthenticated(User));
+        return HandleResult<bool>(await _authService.IsAuthenticated());
     }
 
     protected override ActionResult<T> HandleResult<T>(Result<T> result)
