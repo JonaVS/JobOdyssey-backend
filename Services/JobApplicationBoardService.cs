@@ -28,16 +28,14 @@ public class JobApplicationBoardService : UserAwareBaseService
     {
         try
         {
-            if (userId is null) return Result<JobBoardResponseDto>.Failure("Invalid user ID", (int)HttpStatusCode.BadRequest);
+            var userResult = await CheckUserExistence();
 
-            var dbUser = await _userManager.FindByIdAsync(userId);
-
-            if (dbUser is null) return Result<JobBoardResponseDto>.Failure("User not found in database", (int)HttpStatusCode.BadRequest);
+            if (!userResult.Succeeded) return Result<JobBoardResponseDto>.Failure(userResult.Error, userResult.ErrorCode); 
 
             var newJobBoard = new JobApplicationBoard()
             {
                 Name = createData.Name,
-                User = dbUser
+                User = userResult.Data!
             };
 
             await _dbContext.JobApplicationBoards.AddAsync(newJobBoard);
