@@ -18,7 +18,7 @@ public class AuthService : UserAwareBaseService
         IHttpContextAccessor httpContextAccessor, 
         UserManager<ApplicationUser> userManager, 
         AuthTokensService tokenService, 
-        IMapper mapper) : base (httpContextAccessor)
+        IMapper mapper) : base (httpContextAccessor, userManager)
     {
         _userManager = userManager;
         _tokenService = tokenService;

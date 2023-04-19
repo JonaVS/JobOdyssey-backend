@@ -17,7 +17,7 @@ public class JobApplicationBoardService : UserAwareBaseService
     public JobApplicationBoardService(
         IHttpContextAccessor httpContextAccessor,
         UserManager<ApplicationUser> userManager,
-        AppDbContext dbContext, IMapper mapper) : base(httpContextAccessor)
+        AppDbContext dbContext, IMapper mapper) : base(httpContextAccessor, userManager)
     {
         _userManager = userManager;
         _dbContext = dbContext;
