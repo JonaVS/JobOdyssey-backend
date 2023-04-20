@@ -20,16 +20,16 @@ public class JobApplicationBoardController : BaseApiController
     [Authorize]
     [HttpPost("create")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<ActionResult<JobBoardResponseDto>> Create(JobBoardCreateRequestDto requestDto)
+    public async Task<ActionResult<JobBoardDto>> Create(CreateJobBoardDto requestDto)
     {
-        return HandleResult<JobBoardResponseDto>(await _jobBoardService.CreateBoard(requestDto));
+        return HandleResult<JobBoardDto>(await _jobBoardService.CreateBoard(requestDto));
     }
 
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult<List<JobBoardResponseDto>>> GetBoards()
+    public async Task<ActionResult<List<JobBoardDto>>> GetBoards()
     {
-        return HandleResult<List<JobBoardResponseDto>>(await _jobBoardService.GetBoards());
+        return HandleResult<List<JobBoardDto>>(await _jobBoardService.GetBoards());
     }
 
     [Authorize]

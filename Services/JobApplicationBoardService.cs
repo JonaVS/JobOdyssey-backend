@@ -26,13 +26,13 @@ public class JobApplicationBoardService : UserAwareBaseService
         _mapper = mapper;
     }
 
-    public async Task<Result<JobBoardResponseDto>> CreateBoard(JobBoardCreateRequestDto createData)
+    public async Task<Result<JobBoardDto>> CreateBoard(CreateJobBoardDto createData)
     {
         try
         {
             var userResult = await CheckUserExistence();
 
-            if (!userResult.Succeeded) return Result<JobBoardResponseDto>.Failure(userResult.Error, userResult.ErrorCode); 
+            if (!userResult.Succeeded) return Result<JobBoardDto>.Failure(userResult.Error, userResult.ErrorCode); 
 
             var newJobBoard = new JobApplicationBoard()
             {
@@ -43,32 +43,32 @@ public class JobApplicationBoardService : UserAwareBaseService
             await _dbContext.JobApplicationBoards.AddAsync(newJobBoard);
             await _dbContext.SaveChangesAsync();
 
-            return  Result<JobBoardResponseDto>.Success(_mapper.Map<JobBoardResponseDto>(newJobBoard));
+            return  Result<JobBoardDto>.Success(_mapper.Map<JobBoardDto>(newJobBoard));
         }
         catch (Exception)
         {
-            return Result<JobBoardResponseDto>.Failure("An error ocurred while creating the Job application board", (int)HttpStatusCode.InternalServerError);
+            return Result<JobBoardDto>.Failure("An error ocurred while creating the Job application board", (int)HttpStatusCode.InternalServerError);
         }
     }
 
-    public async Task<Result<List<JobBoardResponseDto>>> GetBoards()
+    public async Task<Result<List<JobBoardDto>>> GetBoards()
     {
         try
         {
             var userResult = await CheckUserExistence();
 
-            if (!userResult.Succeeded) return Result<List<JobBoardResponseDto>>.Failure(userResult.Error, userResult.ErrorCode);
+            if (!userResult.Succeeded) return Result<List<JobBoardDto>>.Failure(userResult.Error, userResult.ErrorCode);
 
             var boards = await _dbContext.JobApplicationBoards
                 .Where(board => board.User.Id == userId)
-                .ProjectTo<JobBoardResponseDto>(_mapper.ConfigurationProvider)
+                .ProjectTo<JobBoardDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            return Result<List<JobBoardResponseDto>>.Success(boards);
+            return Result<List<JobBoardDto>>.Success(boards);
         }
         catch (Exception)
         {
-            return Result<List<JobBoardResponseDto>>.Failure("An error ocurred while fetching the boards", (int)HttpStatusCode.InternalServerError);
+            return Result<List<JobBoardDto>>.Failure("An error ocurred while fetching the boards", (int)HttpStatusCode.InternalServerError);
         }
     }
 
