@@ -80,12 +80,12 @@ public class JobApplicationBoardService : UserAwareBaseService
 
             if (!ownershipResult.Succeeded) return Result<List<PopulatedJobBoardDto>>.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
             
-            var boards = await _dbContext.JobApplicationBoards
+            var board = await _dbContext.JobApplicationBoards
                 .Where(board => board.Id == boardId && board.User.Id == userId)
                 .ProjectTo<PopulatedJobBoardDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            return Result<List<PopulatedJobBoardDto>>.Success(boards);
+            return Result<List<PopulatedJobBoardDto>>.Success(board);
         }
         catch (Exception)
         {
