@@ -15,5 +15,9 @@ public class MapperConfig : Profile
             RefreshToken = context.Items["refreshToken"] as string ?? string.Empty
         });
         CreateMap<JobApplicationBoard, JobBoardResponseDto>();
+        CreateMap<JobApplicationBoard, PopulatedJobBoardDto>();
+        CreateMap<JobApplication, JobApplicationDto>()
+            .ForMember(dest => dest.JobBoardId, opt => opt.MapFrom(src => src.JobBoard.Id))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
     }
 }
