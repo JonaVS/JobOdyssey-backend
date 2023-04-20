@@ -71,4 +71,40 @@ public class JobApplicationBoardService : UserAwareBaseService
             return Result<List<JobBoardResponseDto>>.Failure("An error ocurred while fetching the boards", (int)HttpStatusCode.InternalServerError);
         }
     }
+
+    public async Task<Result<List<PopulatedJobBoardDto>>> GetBoardById(string boardId)
+    {
+        try
+        {
+            var ownershipResult = await VerifyBoardOwnership(boardId);
+
+            if (!ownershipResult.Succeeded) return Result<List<PopulatedJobBoardDto>>.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
+            
+            var boards = await _dbContext.JobApplicationBoards
+                .Where(board => board.Id == boardId && board.User.Id == userId)
+                .ProjectTo<PopulatedJobBoardDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return Result<List<PopulatedJobBoardDto>>.Success(boards);
+        }
+        catch (Exception)
+        {
+            return Result<List<PopulatedJobBoardDto>>.Failure("An error ocurred while fetching the specified board", (int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    private async Task<Result<bool>> VerifyBoardOwnership(string boardId)
+    {
+        var userResult = await CheckUserExistence();
+
+        if (!userResult.Succeeded) return Result<bool>.Failure(userResult.Error, userResult.ErrorCode);
+
+        var board = await _dbContext.JobApplicationBoards
+            .FirstOrDefaultAsync(board => board.Id == boardId  && board.User.Id == userId);
+
+        if (board is null) return Result<bool>.Failure("Board not found", (int)HttpStatusCode.NotFound);  
+         
+        return Result<bool>.Success(true);  
+    }
+
 }
