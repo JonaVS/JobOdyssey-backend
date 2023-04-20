@@ -31,4 +31,11 @@ public class JobApplicationBoardController : BaseApiController
     {
         return HandleResult<List<JobBoardResponseDto>>(await _jobBoardService.GetBoards());
     }
+
+    [Authorize]
+    [HttpGet("{id}")]
+    public async Task<ActionResult<List<PopulatedJobBoardDto>>> GetBoardById(string id)
+    {
+        return HandleResult<List<PopulatedJobBoardDto>>(await _jobBoardService.GetBoardById(id));
+    }
 }
