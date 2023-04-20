@@ -8,6 +8,7 @@ namespace JobOdysseyApi.Controllers;
 
 [ApiController]
 [Route("api/job-boards")]
+[Authorize]
 public class JobApplicationBoardController : BaseApiController
 {
     private readonly JobApplicationBoardService _jobBoardService;
@@ -17,7 +18,6 @@ public class JobApplicationBoardController : BaseApiController
         _jobBoardService = jobBoardService;
     }
 
-    [Authorize]
     [HttpPost("create")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<ActionResult<JobBoardDto>> Create(CreateJobBoardDto requestDto)
@@ -25,14 +25,12 @@ public class JobApplicationBoardController : BaseApiController
         return HandleResult<JobBoardDto>(await _jobBoardService.CreateBoard(requestDto));
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<ActionResult<List<JobBoardDto>>> GetBoards()
     {
         return HandleResult<List<JobBoardDto>>(await _jobBoardService.GetBoards());
     }
 
-    [Authorize]
     [HttpGet("{id}")]
     public async Task<ActionResult<List<PopulatedJobBoardDto>>> GetBoardById(string id)
     {
