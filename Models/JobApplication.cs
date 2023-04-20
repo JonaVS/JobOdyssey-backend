@@ -20,7 +20,7 @@ public class JobApplication : TimeTrackableEntity
     [Required]
     public string CompanyName { get; set; } = string.Empty;
     [Required]
-    public DateTime ApplicationDate { get; set; }
+    public DateTimeOffset ApplicationDate { get; set; }
     public string? JobDescription { get; set; }
     public string? JobUrl { get; set; }
     public string? Notes { get; set; }
