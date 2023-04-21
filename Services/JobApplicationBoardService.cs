@@ -88,6 +88,29 @@ public class JobApplicationBoardService : UserAwareBaseService
         }
     }
 
+    public async Task<Result<JobBoardDto>> UpdateBoard(string boardId, UpdateJobBoardDto updateData)
+    {
+        try
+        {
+            var ownershipResult = await VerifyBoardOwnership(boardId, populate: false);
+
+            if (!ownershipResult.Succeeded) return Result<JobBoardDto>.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
+
+            var targetBoard = ownershipResult.Data;
+
+            //For now, only the board name can be updated
+            targetBoard!.Name = updateData.Name;
+
+            await _dbContext.SaveChangesAsync();
+
+            return Result<JobBoardDto>.Success(_mapper.Map<JobBoardDto>(targetBoard));
+        }
+        catch (Exception)
+        {
+            return Result<JobBoardDto>.Failure("An error ocurred while updating the specified board", (int)HttpStatusCode.InternalServerError);    
+        }
+    }
+
     private async Task<Result<JobApplicationBoard>> VerifyBoardOwnership(string boardId, bool populate = false)
     {
         var userResult = await CheckUserExistence();
