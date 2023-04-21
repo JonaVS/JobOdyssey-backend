@@ -36,4 +36,11 @@ public class JobApplicationBoardController : BaseApiController
     {
         return HandleResult<PopulatedJobBoardDto>(await _jobBoardService.GetBoardById(id));
     }
+
+    [HttpPatch("{id}")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
+    public async Task<ActionResult<JobBoardDto>> UpdateBoard(string id, [FromBody] UpdateJobBoardDto requestDto)
+    {
+        return HandleResult<JobBoardDto>(await _jobBoardService.UpdateBoard(id, requestDto));
+    }
 }
