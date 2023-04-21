@@ -72,39 +72,46 @@ public class JobApplicationBoardService : UserAwareBaseService
         }
     }
 
-    public async Task<Result<List<PopulatedJobBoardDto>>> GetBoardById(string boardId)
+    public async Task<Result<PopulatedJobBoardDto>> GetBoardById(string boardId)
     {
         try
         {
-            var ownershipResult = await VerifyBoardOwnership(boardId);
+            var ownershipResult = await VerifyBoardOwnership(boardId, populate: true);
 
-            if (!ownershipResult.Succeeded) return Result<List<PopulatedJobBoardDto>>.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
-            
-            var board = await _dbContext.JobApplicationBoards
-                .Where(board => board.Id == boardId && board.User.Id == userId)
-                .ProjectTo<PopulatedJobBoardDto>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+            if (!ownershipResult.Succeeded) return Result<PopulatedJobBoardDto>.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
 
-            return Result<List<PopulatedJobBoardDto>>.Success(board);
+            return Result<PopulatedJobBoardDto>.Success(_mapper.Map<PopulatedJobBoardDto>(ownershipResult.Data));
         }
         catch (Exception)
         {
-            return Result<List<PopulatedJobBoardDto>>.Failure("An error ocurred while fetching the specified board", (int)HttpStatusCode.InternalServerError);
+            return Result<PopulatedJobBoardDto>.Failure("An error ocurred while fetching the specified board", (int)HttpStatusCode.InternalServerError);
         }
     }
 
-    private async Task<Result<bool>> VerifyBoardOwnership(string boardId)
+    private async Task<Result<JobApplicationBoard>> VerifyBoardOwnership(string boardId, bool populate = false)
     {
         var userResult = await CheckUserExistence();
 
-        if (!userResult.Succeeded) return Result<bool>.Failure(userResult.Error, userResult.ErrorCode);
+        if (!userResult.Succeeded) return Result<JobApplicationBoard>.Failure(userResult.Error, userResult.ErrorCode);
 
-        var board = await _dbContext.JobApplicationBoards
-            .FirstOrDefaultAsync(board => board.Id == boardId  && board.User.Id == userId);
+        JobApplicationBoard? board;
 
-        if (board is null) return Result<bool>.Failure("Board not found", (int)HttpStatusCode.NotFound);  
-         
-        return Result<bool>.Success(true);  
+        if (populate)
+        {
+            board = await _dbContext.JobApplicationBoards
+                .Where(board => board.Id == boardId && board.User.Id == userId)
+                .Include(x => x.JobApplications)
+                .FirstOrDefaultAsync(); 
+        }
+        else
+        {
+            board = await _dbContext.JobApplicationBoards
+                .FirstOrDefaultAsync(board => board.Id == boardId && board.User.Id == userId);
+        }
+
+        if (board is null) return Result<JobApplicationBoard>.Failure("The specified board does not exist or is inaccessible.", (int)HttpStatusCode.NotFound);
+
+        return Result<JobApplicationBoard>.Success(board);
     }
 
 }

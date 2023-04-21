@@ -32,8 +32,8 @@ public class JobApplicationBoardController : BaseApiController
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<List<PopulatedJobBoardDto>>> GetBoardById(string id)
+    public async Task<ActionResult<PopulatedJobBoardDto>> GetBoardById(string id)
     {
-        return HandleResult<List<PopulatedJobBoardDto>>(await _jobBoardService.GetBoardById(id));
+        return HandleResult<PopulatedJobBoardDto>(await _jobBoardService.GetBoardById(id));
     }
 }
