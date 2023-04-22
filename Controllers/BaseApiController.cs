@@ -5,10 +5,17 @@ namespace JobOdysseyApi.Controllers;
 
 public class BaseApiController : ControllerBase
 {
+    private const string errorType = "Action error";
+    
     protected virtual ActionResult<T> HandleResult<T>(Result<T> result)
     {
-        return result.Succeeded ?
-            (result.Data is not null ? Ok(result.Data) : NoContent()) 
-            : StatusCode(result.ErrorCode, ErrorResponse.Generate("Action error", result.ErrorCode, result.Error!));
+        return result.Succeeded ? Ok(result.Data) 
+            : StatusCode(result.ErrorCode, ErrorResponse.Generate(errorType, result.ErrorCode, result.Error!));
+    }
+
+    protected virtual ActionResult HandleResult(Result result)
+    {
+        return result.Succeeded ? NoContent() 
+            : StatusCode(result.ErrorCode, ErrorResponse.Generate(errorType, result.ErrorCode, result.Error!));
     }
 }
