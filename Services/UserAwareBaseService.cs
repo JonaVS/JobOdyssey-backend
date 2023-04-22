@@ -4,7 +4,7 @@ using JobOdysseyApi.Core;
 using JobOdysseyApi.Models;
 using JobOdysseyApi.Services;
 
-public class UserAwareBaseService : BaseService
+public abstract class UserAwareBaseService : BaseService
 {
     protected readonly ClaimsPrincipal? user;
     protected readonly string? userId;
