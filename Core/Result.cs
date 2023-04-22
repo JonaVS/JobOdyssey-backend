@@ -1,9 +1,7 @@
 namespace JobOdysseyApi.Core;
-public class Result<T>
+
+public class Result<T> : Result
 {
-    public bool Succeeded { get; set; }
-    public string Error { get; set; } = string.Empty;
-    public int ErrorCode { get; set; }
     public T? Data { get; set; }
 
     public static Result<T> Success(T data)
@@ -11,7 +9,7 @@ public class Result<T>
         return new Result<T> { Succeeded = true, Data = data };
     }
 
-    public static Result<T> Failure(string error, int errorCode)
+    public new static Result<T> Failure(string error, int errorCode)
     {
         return new Result<T> { Succeeded = false, Error = error, ErrorCode = errorCode };
     }
