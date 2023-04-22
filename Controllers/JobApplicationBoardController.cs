@@ -43,4 +43,10 @@ public class JobApplicationBoardController : BaseApiController
     {
         return HandleResult<JobBoardDto>(await _jobBoardService.UpdateBoard(id, requestDto));
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteBoard(string id)
+    {
+        return HandleResult(await _jobBoardService.DeleteBoard(id));
+    }
 }
