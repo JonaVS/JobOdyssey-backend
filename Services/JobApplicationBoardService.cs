@@ -111,6 +111,28 @@ public class JobApplicationBoardService : UserAwareBaseService
         }
     }
 
+    public async Task<Result> DeleteBoard(string boardId)
+    {
+        try
+        {
+            var ownershipResult = await VerifyBoardOwnership(boardId, populate: false);
+
+            if (!ownershipResult.Succeeded) return Result.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
+
+            var targetBoard = ownershipResult.Data;
+
+            _dbContext.JobApplicationBoards.Remove(targetBoard!);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Result.Success();
+        }
+        catch (Exception)
+        {
+            return Result.Failure("An error ocurred while deleting the specified board", (int)HttpStatusCode.InternalServerError);
+        }
+    }
+
     private async Task<Result<JobApplicationBoard>> VerifyBoardOwnership(string boardId, bool populate = false)
     {
         var userResult = await CheckUserExistence();
