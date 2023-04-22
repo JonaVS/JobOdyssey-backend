@@ -1,28 +1,22 @@
 using System.Net;
-using AutoMapper;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
 using JobOdysseyApi.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace JobOdysseyApi.Services;
 
 
 public class AuthService : UserAwareBaseService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
     private readonly AuthTokensService _tokenService;
-    private readonly IMapper _mapper;
 
     public AuthService(
         IHttpContextAccessor httpContextAccessor, 
-        UserManager<ApplicationUser> userManager, 
         AuthTokensService tokenService, 
-        IMapper mapper) : base (httpContextAccessor, userManager)
+        CoreServiceDependencies coreServiceDependencies
+    ) : base (httpContextAccessor, coreServiceDependencies)
     {
-        _userManager = userManager;
         _tokenService = tokenService;
-        _mapper = mapper;
     }
 
     public async Task<Result<AuthResponseDto>> Register(RegisterRequestDto registerData)

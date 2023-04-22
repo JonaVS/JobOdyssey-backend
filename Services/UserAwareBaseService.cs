@@ -2,21 +2,20 @@ using System.Net;
 using System.Security.Claims;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Models;
-using Microsoft.AspNetCore.Identity;
+using JobOdysseyApi.Services;
 
-public class UserAwareBaseService
+public class UserAwareBaseService : BaseService
 {
     protected readonly ClaimsPrincipal? user;
     protected readonly string? userId;
-    private readonly UserManager<ApplicationUser> _userManager;
 
     public UserAwareBaseService(
         IHttpContextAccessor httpContextAccessor, 
-        UserManager<ApplicationUser> userManager)
+        CoreServiceDependencies coreServiceDependencies
+        ):base(coreServiceDependencies)
     {
         user = httpContextAccessor.HttpContext?.User;
         userId = GetUserId();
-        _userManager = userManager;
     }
 
     private string? GetUserId()

@@ -1,10 +1,7 @@
 using System.Net;
-using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using JobOdysseyApi.Core;
-using JobOdysseyApi.Data;
 using JobOdysseyApi.Dtos;
 using JobOdysseyApi.Models;
 
@@ -12,19 +9,11 @@ namespace JobOdysseyApi.Services;
 
 public class JobApplicationBoardService : UserAwareBaseService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly AppDbContext _dbContext;
-    private readonly IMapper _mapper;
-
     public JobApplicationBoardService(
         IHttpContextAccessor httpContextAccessor,
-        UserManager<ApplicationUser> userManager,
-        AppDbContext dbContext, IMapper mapper) : base(httpContextAccessor, userManager)
-    {
-        _userManager = userManager;
-        _dbContext = dbContext;
-        _mapper = mapper;
-    }
+        CoreServiceDependencies coreServiceDependencies
+        ) : base(httpContextAccessor, coreServiceDependencies)
+    { }
 
     public async Task<Result<JobBoardDto>> CreateBoard(CreateJobBoardDto createData)
     {
