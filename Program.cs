@@ -5,6 +5,7 @@ using JobOdysseyApi.Data;
 using JobOdysseyApi.Filters;
 using JobOdysseyApi.Models;
 using JobOdysseyApi.Services;
+using JobOdysseyApi.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddSignInManager<SignInManager<ApplicationUser>>();
 builder.Services.AddScoped<AuthTokensService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CoreServiceDependencies>();
 builder.Services.AddScoped<JobApplicationBoardService>();
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<RefreshTokenValidationFilterAttribute>();
