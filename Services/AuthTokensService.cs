@@ -5,26 +5,17 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using JobOdysseyApi.Core;
-using JobOdysseyApi.Data;
 using JobOdysseyApi.Dtos;
 using JobOdysseyApi.Models;
 
 namespace JobOdysseyApi.Services;
 
-public class AuthTokensService
+public class AuthTokensService : BaseService
 {
     private readonly string JwtSecret = DotNetEnv.Env.GetString("JWT_SECRET");
     private SecurityToken? generatedJwtToken;
-    private readonly AppDbContext _dbContext;
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public AuthTokensService(AppDbContext dbContext, UserManager<ApplicationUser> userManager)
-    {
-        _dbContext = dbContext;
-        _userManager = userManager;
-    }
+    public AuthTokensService(CoreServiceDependencies coreServiceDependencies) : base (coreServiceDependencies) { }
 
     public async Task<Result<AuthTokensDto>> GenerateAuthTokens(ApplicationUser user) {
         try
