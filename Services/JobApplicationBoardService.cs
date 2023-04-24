@@ -122,7 +122,7 @@ public class JobApplicationBoardService : UserAwareBaseService
         }
     }
 
-    private async Task<Result<JobApplicationBoard>> VerifyBoardOwnership(string boardId, bool populate = false)
+    public async Task<Result<JobApplicationBoard>> VerifyBoardOwnership(string boardId,  bool populate = false)
     {
         var userResult = await CheckUserExistence();
 
@@ -147,5 +147,4 @@ public class JobApplicationBoardService : UserAwareBaseService
 
         return Result<JobApplicationBoard>.Success(board);
     }
-
 }
