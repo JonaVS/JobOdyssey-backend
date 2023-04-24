@@ -26,6 +26,7 @@ builder.Services.AddScoped<AuthTokensService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CoreServiceDependencies>();
 builder.Services.AddScoped<JobApplicationBoardService>();
+builder.Services.AddScoped<JobApplicationService>();
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<RefreshTokenValidationFilterAttribute>();
 
