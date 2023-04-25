@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.EntityFrameworkCore;
 using JobOdysseyApi.Core;
 using JobOdysseyApi.Dtos;
 using JobOdysseyApi.Models;
@@ -51,5 +52,37 @@ public class JobApplicationService : UserAwareBaseService
         {
             return Result<JobApplicationDto>.Failure("An error ocurred while creating the job application", (int)HttpStatusCode.InternalServerError);
         }
+    }
+
+    public async Task<Result<JobApplicationDto>> GetJobApplicationById(string applicationId)
+    {
+        try
+        {
+            var ownershipResult = await VerifyJobApplicationOwnership(applicationId);
+
+            if (!ownershipResult.Succeeded) return Result<JobApplicationDto>.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
+
+            return Result<JobApplicationDto>.Success(_mapper.Map<JobApplicationDto>(ownershipResult.Data));
+        }
+        catch (Exception)
+        {
+            return Result<JobApplicationDto>.Failure("An error ocurred while fetching the specified job application", (int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    private async Task<Result<JobApplication>> VerifyJobApplicationOwnership(string applicationId)
+    {
+       var checkUserExistenceResult = await CheckUserExistence();
+
+       if (!checkUserExistenceResult.Succeeded)
+       {
+         return Result<JobApplication>.Failure(checkUserExistenceResult.Error, checkUserExistenceResult.ErrorCode);
+       }
+
+       var jobApplication = await _dbContext.JobApplications.FirstOrDefaultAsync(x => x.Id == applicationId && x.User.Id == userId);
+
+       if (jobApplication is null) return Result<JobApplication>.Failure("The specified job application does not exist or is inaccessible.", (int)HttpStatusCode.NotFound);
+    
+       return Result<JobApplication>.Success(jobApplication);
     }
 }
