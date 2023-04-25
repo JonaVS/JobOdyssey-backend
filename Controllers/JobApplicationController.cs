@@ -24,4 +24,10 @@ public class JobApplicationController : BaseApiController
     {
         return HandleResult<JobApplicationDto>(await _jobApplicationService.CreateJobApplication(requestDto));
     }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<JobApplicationDto>> GetJobApplicationById(string id)
+    {
+        return HandleResult<JobApplicationDto>(await _jobApplicationService.GetJobApplicationById(id));
+    }
 }
