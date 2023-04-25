@@ -1,18 +1,26 @@
 using System.ComponentModel.DataAnnotations;
 
+/*
+    Json converter runs before this.
+    It will set the field as null if it cant get a valid date from the json payload
+*/
 public class ApplicationDateValidationAttribute : ValidationAttribute
 {
+    private readonly bool _allowNull;
+
+    public ApplicationDateValidationAttribute(bool allowNull = false)
+    {
+        _allowNull = allowNull;
+    }
     public override bool IsValid(object? value)
     {
-        if (value == null || string.IsNullOrEmpty(value.ToString()))
+        if (_allowNull && value is null)
         {
-            ErrorMessage = "Job application date field is required";
-            return false;
+            return true;
         }
-
-        if (!DateTime.TryParse(value.ToString(), out DateTime result))
+        else if (!_allowNull && value is null)
         {
-            ErrorMessage = "A valid date must be provided";
+            ErrorMessage = "A valid applicationDate field is required";
             return false;
         }
 
