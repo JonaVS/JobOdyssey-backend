@@ -37,7 +37,7 @@ public class JobApplicationService : UserAwareBaseService
                 JobDescription = createData.JobDescription,
                 JobUrl = createData.JobUrl,
                 Notes = createData.Notes,
-                Status = (JobApplicationStatus)Enum.Parse(typeof(JobApplicationStatus), createData.Status.ToString()!),
+                Status = (JobApplicationStatus)createData.Status!,
                 User = jobBoard!.User,
                 JobBoard = jobBoard
             };
