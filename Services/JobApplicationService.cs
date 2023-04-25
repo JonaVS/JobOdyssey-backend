@@ -6,7 +6,6 @@ using JobOdysseyApi.Models;
 
 namespace JobOdysseyApi.Services;
 
-
 public class JobApplicationService : UserAwareBaseService
 {
     private readonly JobApplicationBoardService _jobApplicationBoardService;
@@ -67,6 +66,28 @@ public class JobApplicationService : UserAwareBaseService
         catch (Exception)
         {
             return Result<JobApplicationDto>.Failure("An error ocurred while fetching the specified job application", (int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    public async Task<Result> UpdateStatus(UpdateJobApplicationStatusDto statusData, string applicationId)
+    {
+        try
+        {
+            var ownershipResult = await VerifyJobApplicationOwnership(applicationId);
+
+            if (!ownershipResult.Succeeded) return Result.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
+
+            var targetApplication = ownershipResult.Data;
+
+            targetApplication!.Status = (JobApplicationStatus)statusData.Status!;
+
+            await _dbContext.SaveChangesAsync();
+
+            return Result.Success();
+        }
+        catch (Exception)
+        {
+            return Result.Failure("An error ocurred while updating the specified job application", (int)HttpStatusCode.InternalServerError);
         }
     }
 
