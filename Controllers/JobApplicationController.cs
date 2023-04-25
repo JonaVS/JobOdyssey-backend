@@ -30,4 +30,11 @@ public class JobApplicationController : BaseApiController
     {
         return HandleResult<JobApplicationDto>(await _jobApplicationService.GetJobApplicationById(id));
     }
+
+    [HttpPatch("{id}/status")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
+    public async Task<ActionResult> UpdateJobApplicationStatus(string id, [FromBody] UpdateJobApplicationStatusDto requestDto)
+    {
+        return HandleResult(await _jobApplicationService.UpdateStatus(requestDto, id));
+    }
 }
