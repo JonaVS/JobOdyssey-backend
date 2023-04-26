@@ -91,6 +91,55 @@ public class JobApplicationService : UserAwareBaseService
         }
     }
 
+    public async Task<Result> UpdateContent(UpdateJobApplicationDto updateData, string applicationId)
+    {
+        try
+        {
+            var ownershipResult = await VerifyJobApplicationOwnership(applicationId);
+
+            if (!ownershipResult.Succeeded) return Result.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
+
+            var targetApplication = ownershipResult.Data;
+            var dtoProperties = typeof(UpdateJobApplicationDto).GetProperties();
+            var modelProperties = typeof(JobApplication).GetProperties();
+
+            //Update the application date first if applicable since it needs special treatment
+            if (updateData.ApplicationDate is not null)
+            {
+                targetApplication!.ApplicationDate = new DateTimeOffset((DateTime)updateData.ApplicationDate!, TimeSpan.Zero);
+                /*
+                    At this point is updated, the value is set to null.
+                    As null, the below foreach is going to ignore the field.
+                */
+                updateData.ApplicationDate = null;
+            }
+
+            //Check every field inside the DTO and update the db entity model accordingly 
+            foreach (var dtoProperty in dtoProperties)
+            {
+                var dtoValue = dtoProperty.GetValue(updateData);
+
+                if (dtoValue is not null)
+                {
+                    var modelProperty = modelProperties.FirstOrDefault(p => p.Name == dtoProperty.Name);
+
+                    if (modelProperty is not null)
+                    {
+                        modelProperty.SetValue(targetApplication, dtoValue);
+                    }
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return Result.Success();
+        }
+        catch (Exception)
+        { 
+            return Result.Failure("An error ocurred while updating the specified job application", (int)HttpStatusCode.InternalServerError);
+        }
+    }
+
     private async Task<Result<JobApplication>> VerifyJobApplicationOwnership(string applicationId)
     {
        var checkUserExistenceResult = await CheckUserExistence();
