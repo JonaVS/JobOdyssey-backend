@@ -140,6 +140,28 @@ public class JobApplicationService : UserAwareBaseService
         }
     }
 
+    public async Task<Result> DeleteJobApplication(string applicationId)
+    {
+        try
+        {
+            var ownershipResult = await VerifyJobApplicationOwnership(applicationId);
+
+            if (!ownershipResult.Succeeded) return Result.Failure(ownershipResult.Error, ownershipResult.ErrorCode);
+
+            var targetApplication = ownershipResult.Data;
+
+            _dbContext.JobApplications.Remove(targetApplication!);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Result.Success();
+        }
+        catch (Exception)
+        {
+           return Result.Failure("An error ocurred while deleting the specified job application", (int)HttpStatusCode.InternalServerError);
+        }
+    }
+
     private async Task<Result<JobApplication>> VerifyJobApplicationOwnership(string applicationId)
     {
        var checkUserExistenceResult = await CheckUserExistence();
