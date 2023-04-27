@@ -20,8 +20,7 @@ await builder.Services.AddPostgresDatabase();
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddJwtAuthentication();
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedEmail = false)
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddSignInManager<SignInManager<ApplicationUser>>();
+    .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddScoped<AuthTokensService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CoreServiceDependencies>();
