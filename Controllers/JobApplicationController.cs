@@ -44,4 +44,10 @@ public class JobApplicationController : BaseApiController
     {
         return HandleResult(await _jobApplicationService.UpdateStatus(requestDto, id));
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteJobApplication(string id)
+    {
+        return HandleResult(await _jobApplicationService.DeleteJobApplication(id));
+    }
 }
