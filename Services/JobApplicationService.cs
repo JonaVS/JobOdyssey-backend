@@ -69,7 +69,7 @@ public class JobApplicationService : UserAwareBaseService
         }
     }
 
-    public async Task<Result> UpdateStatus(UpdateJobApplicationStatusDto statusData, string applicationId)
+    public async Task<Result> UpdateJobApplicationStatus(UpdateJobApplicationStatusDto statusData, string applicationId)
     {
         try
         {
@@ -91,7 +91,7 @@ public class JobApplicationService : UserAwareBaseService
         }
     }
 
-    public async Task<Result> UpdateContent(UpdateJobApplicationDto updateData, string applicationId)
+    public async Task<Result> UpdateJobApplicationContent(UpdateJobApplicationDto updateData, string applicationId)
     {
         try
         {
