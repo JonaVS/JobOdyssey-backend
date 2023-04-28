@@ -6,6 +6,7 @@ public class JobApplicationBoard : TimeTrackableEntity
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     [Required]
+    [MaxLength(50)]
     public string Name { get; set; } = string.Empty;
     [Required]
     public ApplicationUser User { get; set; } = new ApplicationUser();
