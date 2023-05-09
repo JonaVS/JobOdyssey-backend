@@ -7,9 +7,10 @@ public static class ApiCorsServiceExtensions
             options.AddPolicy("ApiCorsConfig", builder =>
             {
                 //This is just for dev mode. Needs to be updated later on.
-                builder.AllowAnyOrigin()
+                builder.WithOrigins("http://localhost:3000")
                        .AllowAnyHeader()
-                       .AllowAnyMethod();
+                       .AllowAnyMethod()
+                       .AllowCredentials();
             });
         });
 
