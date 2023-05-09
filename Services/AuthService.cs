@@ -92,22 +92,22 @@ public class AuthService : UserAwareBaseService
         }
     }
 
-    public async Task<Result<bool>> IsAuthenticated()
+    public async Task<Result<AuthenticatedUserDto>> IsAuthenticated()
     {
-        if (string.IsNullOrEmpty(userId)) return Result<bool>.Failure("Invalid user ID", (int)HttpStatusCode.BadRequest);
+        if (string.IsNullOrEmpty(userId)) return Result<AuthenticatedUserDto>.Failure("Invalid user ID", (int)HttpStatusCode.BadRequest);
 
         try
         {
             var userResult = await CheckUserExistence();
             
-            if (!userResult.Succeeded) return Result<bool>.Failure(userResult.Error, userResult.ErrorCode); 
+            if (!userResult.Succeeded) return Result<AuthenticatedUserDto>.Failure(userResult.Error, userResult.ErrorCode); 
 
-            return Result<bool>.Success(true);
+            return Result<AuthenticatedUserDto>.Success(_mapper.Map<AuthenticatedUserDto>(userResult.Data));
 
         }
         catch (Exception)
         {
-            return Result<bool>.Failure("An error occurred while checking user authentication status", (int)HttpStatusCode.InternalServerError);
+            return Result<AuthenticatedUserDto>.Failure("An error occurred while checking user authentication status", (int)HttpStatusCode.InternalServerError);
         }
     }
 
