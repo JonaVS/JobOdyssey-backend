@@ -80,6 +80,30 @@ public class AuthTokensService : BaseService
         return refreshToken.Token;
     }
 
+    public async Task<Result> RevokeRefreshToken(string refreshToken)
+    {
+        try
+        {
+            var storedRefreshToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshToken);
+            
+            if (storedRefreshToken is null || storedRefreshToken.IsRevoked)
+            {
+                return Result<AuthTokensDto>.Failure("Invalid refresh token", (int)HttpStatusCode.BadRequest);
+            }
+
+           storedRefreshToken.IsRevoked = true;
+
+           await _dbContext.SaveChangesAsync();
+
+           return Result.Success();
+
+        }
+        catch (System.Exception)
+        {
+           return Result.Failure("An error occurred while revoking refresh token", (int)HttpStatusCode.InternalServerError); 
+        }
+    }
+
     public async Task<Result<AuthTokensDto>> VerifyAndRefreshTokens(string token, string refreshToken)
     {
         try
