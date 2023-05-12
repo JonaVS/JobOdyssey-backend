@@ -29,6 +29,7 @@ builder.Services.AddScoped<JobApplicationBoardService>();
 builder.Services.AddScoped<JobApplicationService>();
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<RefreshTokenValidationFilterAttribute>();
+builder.Services.AddScoped<LogoutValidationFilterAttribute>();
 
 var app = builder.Build();
 
