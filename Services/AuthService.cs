@@ -111,6 +111,18 @@ public class AuthService : UserAwareBaseService
         }
     }
 
+    public async Task<Result> Logout(string refreshToken)
+    {
+        var tokenServiceResult = await _tokenService.RevokeRefreshToken(refreshToken);
+
+        if (!tokenServiceResult.Succeeded)
+        {
+          return Result.Failure("An error occurred while logging out the user", (int)HttpStatusCode.InternalServerError);
+        }
+
+        return Result.Success();
+    }
+
     public async Task<Result<AuthResponseDto>> RefreshToken(RefreshTokenRequestDto refreshData)
     {
         var refreshResult = await _tokenService.VerifyAndRefreshTokens(refreshData.Token, refreshData.RefreshToken);
