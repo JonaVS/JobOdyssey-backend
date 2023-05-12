@@ -47,6 +47,14 @@ public class AuthController : BaseApiController
         return HandleResult<AuthenticatedUserDto>(await _authService.IsAuthenticated());
     }
 
+    [Authorize]
+    [HttpPost("logout")]
+    [ServiceFilter(typeof(LogoutValidationFilterAttribute))]
+    public async Task<ActionResult> Logout() 
+    {
+        return HandleResult(await _authService.Logout((string)HttpContext.Items["refresh_token"]!));
+    }
+
     protected override ActionResult<T> HandleResult<T>(Result<T> result)
     {
         if (typeof(T) == typeof(AuthResponseDto))
@@ -60,6 +68,16 @@ public class AuthController : BaseApiController
         return base.HandleResult(result);
     }
 
+    protected override ActionResult HandleResult(Result result)
+    {     
+        if (Request.Path == "/api/auth/logout" && result.Succeeded)
+        {
+            DeleteRefreshTokenCookie();
+        }
+
+        return base.HandleResult(result);
+    }
+
     private void SetRefreshTokenCookie(string refreshToken)
     {
         Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
@@ -68,5 +86,10 @@ public class AuthController : BaseApiController
             Secure = DotNetEnv.Env.GetString("ASPNETCORE_ENVIRONMENT") == "Production" ? true : false,
             Expires = DateTime.UtcNow.AddMonths(1),
         });
+    }
+
+    private void DeleteRefreshTokenCookie()
+    {
+        Response.Cookies.Delete("refresh_token");
     }
 }
