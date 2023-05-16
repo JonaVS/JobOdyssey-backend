@@ -18,7 +18,7 @@ public class JobApplicationBoardController : BaseApiController
         _jobBoardService = jobBoardService;
     }
 
-    [HttpPost("create")]
+    [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<ActionResult<JobBoardDto>> Create(CreateJobBoardDto requestDto)
     {
